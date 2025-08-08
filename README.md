@@ -21,8 +21,8 @@ https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
     Open a terminal and run:
 
     ```bash
-    git clone https://github.com/nnhida/cf-iot-template.git
-    cd cf-iot-template
+    git clone https://github.com/nnhida/cf-iot-templates.git
+    cd cf-iot-templates
     ```
 
 2. **Prepare your parameters file**
@@ -42,7 +42,7 @@ https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 
     - Replace `template.yml` with the path to your CloudFormation template file.  
     - Replace `parameters.yml` with the path to your parameters file.  
-    - Replace `IoTInfrastructureStack` with your preferred stack name.
+    - Replace `stackname` with your preferred stack name.
 
 4. **Verify the stack deployment**
 
