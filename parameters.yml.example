@@ -1,0 +1,3 @@
+Parameters:
+  ThingName: YourIoTThingName
+  PolicyName: YourIoTPolicyName

@@ -1,0 +1,74 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: database configuration using mariadb
+
+Parameters: 
+  SG: 
+    Description: "Security Group ID for RDS"
+    Type: String
+  VPC:
+    Description: "VPC ID for RDS"
+    Type: String
+  Subnet1:
+    Description: "First subnet ID"
+    Type: String
+  Subnet2:
+    Description: "Second subnet ID"
+    Type: String
+  Subnet3:
+    Description: "Third subnet ID"
+    Type: String
+  DBSubnetGroupName:
+    Description: "Name for DB Subnet Group"
+    Type: String
+  DBInstanceIdentifier:
+    Description: "Identifier for RDS Instance"
+    Type: String
+  DBName:
+    Description: "Database name"
+    Type: String
+  MasterUsername:
+    Description: "Master username for DB"
+    Type: String
+    NoEcho: true
+  MasterUserPassword:
+    Description: "Master password for DB"
+    Type: String
+    NoEcho: true
+
+Resources:
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet group for db
+      DBSubnetGroupName: !Ref DBSubnetGroupName
+      SubnetIds: 
+        - !Ref Subnet1
+        - !Ref Subnet2
+        - !Ref Subnet3
+      Tags: 
+        - Key: Name
+          Value: !Ref DBSubnetGroupName
+
+  DB:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage: 20
+      DBInstanceIdentifier: !Ref DBInstanceIdentifier
+      DBInstanceClass: db.t3.micro
+      DBName: !Ref DBName
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      DeletionProtection: false
+      Engine: mariadb
+      EngineVersion: 10.5.25
+      MasterUsername: !Ref MasterUsername
+      MasterUserPassword: !Ref MasterUserPassword
+      MultiAZ: false
+      NetworkType: IPV4
+      Port: 3306
+      PubliclyAccessible: false
+      StorageType: gp2
+      Tags: 
+        - Key: Name
+          Value: !Ref DBName
+      VPCSecurityGroups: 
+        - !Ref SG

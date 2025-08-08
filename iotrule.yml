@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: rules for iot thing
+
+Parameters:
+  RuleNameKinesis:
+    Description: "Name of rules for kinesis"
+    Type: String
+  StreamName:
+    Description: "Name of kinesis stream"
+    Type: String
+  RoleArn:
+    Description: "IAM Role"
+    Type: String
+  RoleArnFirehose:
+    Description: "Name of rules for firehose"
+    Type: String
+  DeliveryStreamName:
+    Description: "Name of firehose stream"
+    Type: String
+  iotTopic:
+    Description: "IoT topic name"
+    Type: String
+
+Resources:
+  Rule1:
+    Type: AWS::IoT::TopicRule
+    Properties:
+      RuleName: !Ref RuleNameKinesis
+      TopicRulePayload: 
+        Actions: 
+          - Kinesis:
+              StreamName: !Ref StreamName
+              RoleArn: !Ref RoleArn
+        Description: Rules for Devices connect to Analytics
+        RuleDisabled: false
+        Sql: !Sub "SELECT * FROM '${iotTopic}'"
+
+  Rule2:
+    Type: AWS::IoT::TopicRule
+    Properties:
+      RoleArn: !Ref RoleArnFirehose
+      TopicRulePayload: 
+        Actions: 
+          - Firehose:
+              DeliveryStreamName: !Ref DeliveryStreamName
+              RoleArn: !Ref RoleArn
+        Description: Rules for Devices connect to Kinesis
+        RuleDisabled: false
+        Sql: !Sub "SELECT * FROM '${iotTopic}'"
+

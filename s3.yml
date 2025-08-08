@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: s3 configuration
+
+Parameters:
+  Bucket1Name:
+    Description: Name of the first S3 bucket (website hosting)
+    Type: String
+  Bucket2Name:
+    Description: Name of the second S3 bucket (firehose)
+    Type: String
+  Bucket3Name:
+    Description: Name of the third S3 bucket (model storage)
+    Type: String
+  IpAllowed:
+    Description: Allowed IP for Bucket3 (model storage)
+    Type: String
+  IndexDocumentName:
+    Description: Index document for website hosting
+    Type: String
+    Default: index.html
+
+Resources:
+  Bucket1:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref Bucket1Name
+      PublicAccessBlockConfiguration: 
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      WebsiteConfiguration:
+        IndexDocument: !Ref IndexDocumentName
+
+  Bucket1Policy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Bucket1
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action: 
+              - 's3:GetObject'
+            Effect: Allow
+            Principal: '*'
+            Resource: !Sub "arn:aws:s3:::${Bucket1Name}/*"
+
+  Bucket2:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref Bucket2Name
+      PublicAccessBlockConfiguration: 
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      VersioningConfiguration: 
+        Status: Enabled
+
+  Bucket2Policy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Bucket2
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action: 
+              - 's3:GetObject'
+            Effect: Allow
+            Principal: '*'
+            Resource: !Sub "arn:aws:s3:::${Bucket2Name}/*"
+
+  Bucket3:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref Bucket3Name
+      LifecycleConfiguration: 
+        Rules: 
+          - Id: bucket-rule
+            Status: Enabled
+            ExpirationInDays: 365
+            Transitions:
+              - TransitionInDays: 30
+                StorageClass: DEEP_ARCHIVE
+
+  Bucket3Policy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Bucket3
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action: 
+              - 's3:GetObject'
+            Effect: Allow
+            Principal: '*'
+            Condition:
+              NotIpAddress:
+                "aws:sourceIp": !Ref IpAllowed
+            Resource: !Sub "arn:aws:s3:::${Bucket3Name}/*"

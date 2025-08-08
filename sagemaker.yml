@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: launch sagemaker notebook
+
+Parameters:
+  InstanceType:
+    Description: "Instance Type"
+    Type: String
+  NotebookInstanceName:
+    Description: "Name for NotebookInstance"
+    Type: String
+  PlatformIdentifier:
+    Description: "Platform Identifier"
+    Type: String
+  RoleArn:
+    Description: "IAM Role"
+    Type: String
+
+Resources:
+  notebook:
+    Type: AWS::SageMaker::NotebookInstance
+    Properties:
+      InstanceType: !Ref InstanceType
+      NotebookInstanceName: !Ref NotebookInstance
+      PlatformIdentifier: notebook-al2-v2
+      RoleArn: arn:aws:iam::342942590686:role/LabRole

@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: iot thing configuration
+
+Parameters:
+  ThingName:
+    Description: "name of iot thing"
+    Type: String
+  PolicyName:
+    Description: "policy for iot thing"
+    Type: String
+
+Resources:
+  iotThing:
+    Type: AWS::IoT::Thing
+    Properties:
+      ThingName: !Ref ThingName
+
+  iotPolicies:
+    Type: AWS::IoT::Policy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 'iot:Connect'
+              - 'iot:Publish'
+              - 'iot:Receive'
+              - 'iot:Subscribe'
+            Effect: Allow
+            Resource: '*'
+      PolicyName: !Ref PolicyName
+      Tags: 
+        - Key: Name
+          Value: !Ref PolicyName
+
